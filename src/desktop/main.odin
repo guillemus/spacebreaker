@@ -2,11 +2,11 @@
 // usage: starbreaker [-play] [-wave=N] [-fire] [-missiles] [-shots=f1,f2,..] [-frames=N]
 package main_desktop
 
+import game "../game"
 import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
-import game "../game"
 import rl "vendor:raylib"
 
 parse :: proc(s: string) -> int {
@@ -58,7 +58,12 @@ main :: proc() {
 	}
 	frame := 0
 	for !rl.WindowShouldClose() {
-		if play && fire && frame > 200 && frame % 5 == 0 && game.g.phase == .Playing && !game.g.overheated {
+		if play &&
+		   fire &&
+		   frame > 200 &&
+		   frame % 5 == 0 &&
+		   game.g.phase == .Playing &&
+		   !game.g.overheated {
 			game.fire_bullet()
 		}
 		if play && missiles && frame > 240 && frame % 45 == 0 && game.g.phase == .Playing {

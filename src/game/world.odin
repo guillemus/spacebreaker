@@ -91,7 +91,12 @@ spawn_dir :: proc(front_bias: f32) -> Vec3 {
 	return {math.sin(ang) * math.cos(el), math.sin(el), math.cos(ang) * math.cos(el)}
 }
 
-spawn_asteroid :: proc(tier: int, pos, vel: Vec3, molten: bool = false, ambient: bool = false) -> ^Entity {
+spawn_asteroid :: proc(
+	tier: int,
+	pos, vel: Vec3,
+	molten: bool = false,
+	ambient: bool = false,
+) -> ^Entity {
 	e := new_entity(.Asteroid, pos)
 	if e == nil {
 		return nil
@@ -246,7 +251,10 @@ update_entities :: proc(dt: f32) {
 			e.dead = true
 			continue
 		}
-		if e.kind != .Boss && !g.dying && g.phase == .Playing && dist < PLAYER_RADIUS + e.radius * 0.75 {
+		if e.kind != .Boss &&
+		   !g.dying &&
+		   g.phase == .Playing &&
+		   dist < PLAYER_RADIUS + e.radius * 0.75 {
 			player_collide(e)
 		}
 	}
@@ -268,7 +276,17 @@ update_asteroid :: proc(e: ^Entity, dt: f32) {
 		e.fx_acc += dt
 		if e.fx_acc > 0.08 {
 			e.fx_acc = 0
-			emit(.Ember, e.pos + rand_unit() * e.radius * 0.9, rand_unit() * 2 - e.vel * 0.1, {1, 0.55, 0.15, 1}, {1, 0.15, 0.02, 0}, 0.4, 0.1, rand_range(0.6, 1.2), 0.5)
+			emit(
+				.Ember,
+				e.pos + rand_unit() * e.radius * 0.9,
+				rand_unit() * 2 - e.vel * 0.1,
+				{1, 0.55, 0.15, 1},
+				{1, 0.15, 0.02, 0},
+				0.4,
+				0.1,
+				rand_range(0.6, 1.2),
+				0.5,
+			)
 		}
 	}
 }
@@ -284,14 +302,24 @@ update_drone :: proc(e: ^Entity, dt: f32) {
 		spd *= 1.7
 	}
 	wig := 10 * clamp01((dist - 12) / 60)
-	desired := to * spd + side * (math.sin(e.phase) * wig) + vert * (math.cos(e.phase * 0.7) * wig * 0.6)
+	desired :=
+		to * spd + side * (math.sin(e.phase) * wig) + vert * (math.cos(e.phase * 0.7) * wig * 0.6)
 	e.vel = damp3(e.vel, desired, 3, dt)
 	e.pos += e.vel * dt
 	e.fwd = norm(e.vel)
 	e.fx_acc += dt
 	if e.fx_acc > 0.035 {
 		e.fx_acc = 0
-		emit(.Glow, e.pos - e.fwd * 1.6, -e.fwd * 3, {1, 0.3, 0.85, 0.55}, {0.5, 0.1, 0.9, 0}, 0.8, 0.2, 0.4)
+		emit(
+			.Glow,
+			e.pos - e.fwd * 1.6,
+			-e.fwd * 3,
+			{1, 0.3, 0.85, 0.55},
+			{0.5, 0.1, 0.9, 0},
+			0.8,
+			0.2,
+			0.4,
+		)
 	}
 }
 
@@ -306,7 +334,11 @@ update_fighter :: proc(e: ^Entity, dt: f32) {
 	} else {
 		e.orbit_ang += e.orbit_dir * (0.2 + f32(g.level) * 0.008) * dt
 		r := e.orbit_rad + math.sin(e.age * 0.45) * 10
-		target := Vec3{math.sin(e.orbit_ang) * r, e.orbit_h + math.sin(e.age * 0.8) * 4, math.cos(e.orbit_ang) * r}
+		target := Vec3 {
+			math.sin(e.orbit_ang) * r,
+			e.orbit_h + math.sin(e.age * 0.8) * 4,
+			math.cos(e.orbit_ang) * r,
+		}
 		desired := (target - e.pos) * 1.4
 		if length(desired) > 38 {
 			desired = norm(desired) * 38
@@ -338,7 +370,16 @@ update_fighter :: proc(e: ^Entity, dt: f32) {
 		x, y, z := look_basis(e.fwd, {0, 1, 0})
 		s := e.radius * 0.62
 		for sx in ([2]f32{-0.8, 0.8}) {
-			emit(.Glow, e.pos + (x * sx - y * 0.07 - z * 1.8) * s, -z * 6 + e.vel * 0.3, {1, 0.55, 0.2, 0.5}, {1, 0.2, 0.05, 0}, 0.7, 0.2, 0.3)
+			emit(
+				.Glow,
+				e.pos + (x * sx - y * 0.07 - z * 1.8) * s,
+				-z * 6 + e.vel * 0.3,
+				{1, 0.55, 0.2, 0.5},
+				{1, 0.2, 0.05, 0},
+				0.7,
+				0.2,
+				0.3,
+			)
 		}
 	}
 }
@@ -349,9 +390,27 @@ update_projectile :: proc(e: ^Entity, dt: f32) {
 	if e.fx_acc > 0.025 {
 		e.fx_acc = 0
 		if e.kind == .Nova {
-			emit(.Glow, e.pos + rand_unit() * e.radius * 0.5, rand_unit() * 1.5, {1, 0.3, 0.8, 0.7}, {0.5, 0.05, 0.6, 0}, e.radius * 1.2, e.radius * 0.3, 0.5)
+			emit(
+				.Glow,
+				e.pos + rand_unit() * e.radius * 0.5,
+				rand_unit() * 1.5,
+				{1, 0.3, 0.8, 0.7},
+				{0.5, 0.05, 0.6, 0},
+				e.radius * 1.2,
+				e.radius * 0.3,
+				0.5,
+			)
 		} else {
-			emit(.Glow, e.pos, rand_unit() * 0.6, {1, 0.25, 0.45, 0.6}, {0.6, 0.05, 0.3, 0}, 0.9, 0.2, 0.3)
+			emit(
+				.Glow,
+				e.pos,
+				rand_unit() * 0.6,
+				{1, 0.25, 0.45, 0.6},
+				{0.6, 0.05, 0.3, 0},
+				0.9,
+				0.2,
+				0.3,
+			)
 		}
 	}
 }
@@ -371,7 +430,11 @@ update_boss :: proc(e: ^Entity, dt: f32) {
 		}
 	} else {
 		e.orbit_ang += e.orbit_dir * 0.075 * dt
-		target := Vec3{math.sin(e.orbit_ang) * e.orbit_rad, e.orbit_h + math.sin(e.age * 0.3) * 6, math.cos(e.orbit_ang) * e.orbit_rad}
+		target := Vec3 {
+			math.sin(e.orbit_ang) * e.orbit_rad,
+			e.orbit_h + math.sin(e.age * 0.3) * 6,
+			math.cos(e.orbit_ang) * e.orbit_rad,
+		}
 		e.vel = damp3(e.vel, (target - e.pos) * 0.8, 1.5, dt)
 		e.timer -= dt
 		rage := e.hp < e.max_hp * 0.5
@@ -396,7 +459,17 @@ update_boss :: proc(e: ^Entity, dt: f32) {
 		e.fx_acc = 0
 		p := e.pos + rand_unit() * e.radius * 0.7
 		emit(.Glow, p, rand_unit() * 3, {1, 0.6, 0.2, 0.8}, {0.6, 0.1, 0.05, 0}, 1.5, 3, 0.5, 1)
-		emit(.Smoke, p, rand_unit() * 2, {0.2, 0.18, 0.2, 0.4}, {0.1, 0.1, 0.1, 0}, 1.5, 5, 1.5, 0.6)
+		emit(
+			.Smoke,
+			p,
+			rand_unit() * 2,
+			{0.2, 0.18, 0.2, 0.4},
+			{0.1, 0.1, 0.1, 0},
+			1.5,
+			5,
+			1.5,
+			0.6,
+		)
 	}
 }
 
@@ -550,7 +623,12 @@ kill_entity :: proc(e: ^Entity, dir: Vec3, by_missile: bool) {
 			for k in 0 ..< n {
 				r := rand_unit()
 				r = norm(r - to_player * dot(r, to_player))
-				spawn_asteroid(e.tier + 1, e.pos + r * (e.radius * 0.5), e.vel * 0.55 + r * rand_range(5, 11) + dir * 2, e.molten && k == 0)
+				spawn_asteroid(
+					e.tier + 1,
+					e.pos + r * (e.radius * 0.5),
+					e.vel * 0.55 + r * rand_range(5, 11) + dir * 2,
+					e.molten && k == 0,
+				)
 			}
 		}
 	case .Drone:
@@ -763,6 +841,12 @@ spawn_ambient_field :: proc() {
 		pos := Vec3{math.sin(ang) * dist, rand_range(-18, 18), math.cos(ang) * dist}
 		tangent := norm(cross({0, 1, 0}, pos))
 		tier := rand_int(0, 3)
-		spawn_asteroid(tier, pos, tangent * rand_range(1, 4) + rand_unit() * 0.5, randf() < 0.2, true)
+		spawn_asteroid(
+			tier,
+			pos,
+			tangent * rand_range(1, 4) + rand_unit() * 0.5,
+			randf() < 0.2,
+			true,
+		)
 	}
 }

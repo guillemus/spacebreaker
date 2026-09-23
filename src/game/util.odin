@@ -111,7 +111,12 @@ ease_out :: proc(t: f32) -> f32 {
 }
 
 to_color :: proc(c: Vec4) -> rl.Color {
-	return {u8(clamp01(c.r) * 255), u8(clamp01(c.g) * 255), u8(clamp01(c.b) * 255), u8(clamp01(c.a) * 255)}
+	return {
+		u8(clamp01(c.r) * 255),
+		u8(clamp01(c.g) * 255),
+		u8(clamp01(c.b) * 255),
+		u8(clamp01(c.a) * 255),
+	}
 }
 
 rgba :: proc(c: Vec3, a: f32) -> rl.Color {
@@ -136,12 +141,7 @@ quat_axis :: proc(axis: Vec3, angle: f32) -> Quat {
 
 // Column basis x/y/z + translation, the layout raylib expects for DrawMesh transforms.
 transform :: proc(pos, x, y, z: Vec3) -> rl.Matrix {
-	return rl.Matrix {
-		x.x, y.x, z.x, pos.x,
-		x.y, y.y, z.y, pos.y,
-		x.z, y.z, z.z, pos.z,
-		0, 0, 0, 1,
-	}
+	return rl.Matrix{x.x, y.x, z.x, pos.x, x.y, y.y, z.y, pos.y, x.z, y.z, z.z, pos.z, 0, 0, 0, 1}
 }
 
 transform_q :: proc(pos: Vec3, q: Quat, s: f32) -> rl.Matrix {

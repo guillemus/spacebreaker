@@ -1,8 +1,8 @@
 package main_web
 
+import game "../game"
 import "base:runtime"
 import "core:mem"
-import game "../game"
 
 @(private = "file")
 web_context: runtime.Context

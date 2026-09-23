@@ -7,50 +7,58 @@ import rlgl "vendor:raylib/rlgl"
 BLOOM_LEVELS :: 6
 
 Lit_Locs :: struct {
-	cam_pos, sun_dir, sun_col, amb_top, amb_bot, rim, flash, emissive, fog_col, fog, time, lpos, lcol: i32,
+	cam_pos,
+	sun_dir,
+	sun_col,
+	amb_top,
+	amb_bot,
+	rim,
+	flash,
+	emissive,
+	fog_col,
+	fog,
+	time,
+	lpos,
+	lcol: i32,
 }
 
 Resources :: struct {
-	lit:           rl.Shader,
-	lit_mat:       rl.Material,
-	ll:            Lit_Locs,
-	shield:        rl.Shader,
-	shield_mat:    rl.Material,
-	planet:        rl.Shader,
-	planet_mat:    rl.Material,
-	nebula:        rl.Shader,
-	bright:        rl.Shader,
-	down:          rl.Shader,
-	up:            rl.Shader,
-	composite:     rl.Shader,
-
-	rocks:         [N_ROCKS]rl.Mesh,
-	molten:        [N_MOLTEN]rl.Mesh,
-	chunks:        [N_CHUNKS]rl.Mesh,
-	shard:         rl.Mesh,
-	drone:         rl.Mesh,
-	fighter:       rl.Mesh,
-	boss_hull:     rl.Mesh,
-	boss_core:     rl.Mesh,
-	gun:           rl.Mesh,
-	missile:       rl.Mesh,
-	sphere:        rl.Mesh,
-
-	tex_glow:      rl.Texture2D,
-	tex_soft:      rl.Texture2D,
-	tex_smoke:     rl.Texture2D,
-	tex_ring:      rl.Texture2D,
-	tex_flare:     rl.Texture2D,
-	tex_white:     rl.Texture2D,
-
-	font_title:    rl.Font,
-	font_hud:      rl.Font,
-	font_body:     rl.Font,
-
-	rt_scene:      rl.RenderTexture2D,
-	rt_neb:        rl.RenderTexture2D,
-	rt_bloom:      [BLOOM_LEVELS]rl.RenderTexture2D,
-	rt_w, rt_h:    i32,
+	lit:        rl.Shader,
+	lit_mat:    rl.Material,
+	ll:         Lit_Locs,
+	shield:     rl.Shader,
+	shield_mat: rl.Material,
+	planet:     rl.Shader,
+	planet_mat: rl.Material,
+	nebula:     rl.Shader,
+	bright:     rl.Shader,
+	down:       rl.Shader,
+	up:         rl.Shader,
+	composite:  rl.Shader,
+	rocks:      [N_ROCKS]rl.Mesh,
+	molten:     [N_MOLTEN]rl.Mesh,
+	chunks:     [N_CHUNKS]rl.Mesh,
+	shard:      rl.Mesh,
+	drone:      rl.Mesh,
+	fighter:    rl.Mesh,
+	boss_hull:  rl.Mesh,
+	boss_core:  rl.Mesh,
+	gun:        rl.Mesh,
+	missile:    rl.Mesh,
+	sphere:     rl.Mesh,
+	tex_glow:   rl.Texture2D,
+	tex_soft:   rl.Texture2D,
+	tex_smoke:  rl.Texture2D,
+	tex_ring:   rl.Texture2D,
+	tex_flare:  rl.Texture2D,
+	tex_white:  rl.Texture2D,
+	font_title: rl.Font,
+	font_hud:   rl.Font,
+	font_body:  rl.Font,
+	rt_scene:   rl.RenderTexture2D,
+	rt_neb:     rl.RenderTexture2D,
+	rt_bloom:   [BLOOM_LEVELS]rl.RenderTexture2D,
+	rt_w, rt_h: i32,
 }
 
 res: Resources
@@ -135,7 +143,10 @@ make_texture :: proc(size: i32, style: Tex_Style) -> rl.Texture2D {
 			case .Soft:
 				a = math.exp(-d2 * 3.2)
 			case .Smoke:
-				n := noise3(5, {dx, dy, 0.5}, 3) * 0.5 + noise3(6, {dx, dy, 1.5}, 6.5) * 0.3 + noise3(7, {dx, dy, 2.5}, 13) * 0.2
+				n :=
+					noise3(5, {dx, dy, 0.5}, 3) * 0.5 +
+					noise3(6, {dx, dy, 1.5}, 6.5) * 0.3 +
+					noise3(7, {dx, dy, 2.5}, 13) * 0.2
 				falloff := 1 - smooth(0.0, 1.0, d)
 				a = clamp01(falloff * falloff * (0.55 + 1.1 * n))
 			case .Ring:
@@ -259,7 +270,14 @@ ensure_targets :: proc() {
 // Draws a render texture (stored upside down) over the current target.
 blit :: proc(src: rl.RenderTexture2D, dw, dh: i32) {
 	t := src.texture
-	rl.DrawTexturePro(t, {0, 0, f32(t.width), -f32(t.height)}, {0, 0, f32(dw), f32(dh)}, {0, 0}, 0, rl.WHITE)
+	rl.DrawTexturePro(
+		t,
+		{0, 0, f32(t.width), -f32(t.height)},
+		{0, 0, f32(dw), f32(dh)},
+		{0, 0},
+		0,
+		rl.WHITE,
+	)
 }
 
 fullscreen_quad :: proc(dw, dh: i32) {
@@ -399,7 +417,14 @@ set_lit_frame_uniforms :: proc() {
 	upload_lights()
 }
 
-draw_lit :: proc(mesh: rl.Mesh, m: rl.Matrix, tint: Vec3 = {1, 1, 1}, flash: Vec4 = {}, emissive: Vec3 = {}, spec: f32 = 1) {
+draw_lit :: proc(
+	mesh: rl.Mesh,
+	m: rl.Matrix,
+	tint: Vec3 = {1, 1, 1},
+	flash: Vec4 = {},
+	emissive: Vec3 = {},
+	spec: f32 = 1,
+) {
 	set_v4(res.lit, res.ll.flash, flash)
 	set_v3(res.lit, res.ll.emissive, emissive)
 	res.lit_mat.maps[0].color = to_color({tint.x, tint.y, tint.z, spec})
@@ -470,7 +495,11 @@ render :: proc() {
 		dst := res.rt_bloom[i]
 		rl.BeginTextureMode(dst)
 		rl.BeginShaderMode(res.up)
-		set_v2_name(res.up, "uTexel", {0.5 / f32(src.texture.width), 0.5 / f32(src.texture.height)})
+		set_v2_name(
+			res.up,
+			"uTexel",
+			{0.5 / f32(src.texture.width), 0.5 / f32(src.texture.height)},
+		)
 		set_f_name(res.up, "uGain", 1.0)
 		rl.BeginBlendMode(.ADDITIVE)
 		blit(src, dst.texture.width, dst.texture.height)
@@ -546,7 +575,12 @@ draw_background :: proc() {
 	end_sprites()
 	begin_sprites(res.tex_glow)
 	bb_quad(sun_pos, 60, 0, rgba({1, 1, 1}, 1))
-	streak(sun_pos - g.rright * 520, sun_pos + g.rright * 520, 7, rgba(g.pal.sun * {0.8, 0.9, 1.0}, 0.55))
+	streak(
+		sun_pos - g.rright * 520,
+		sun_pos + g.rright * 520,
+		7,
+		rgba(g.pal.sun * {0.8, 0.9, 1.0}, 0.55),
+	)
 	end_sprites()
 	begin_sprites(res.tex_flare)
 	bb_quad(sun_pos, 220, g.real_time * 0.02, rgba(g.pal.sun, 0.5))
@@ -611,11 +645,25 @@ draw_world_opaque :: proc() {
 			draw_lit(mesh, transform_q(e.pos, e.rot, e.radius), {1, 1, 1}, flash, heat, 0.4)
 		case .Drone:
 			s := 1 - e.warp * e.warp
-			draw_lit(res.drone, entity_transform(e, e.radius * 0.8 * s), {1, 1, 1}, flash + Vec4{0, 0, 0, e.warp}, {}, 1)
+			draw_lit(
+				res.drone,
+				entity_transform(e, e.radius * 0.8 * s),
+				{1, 1, 1},
+				flash + Vec4{0, 0, 0, e.warp},
+				{},
+				1,
+			)
 		case .Fighter:
 			s := 1 - e.warp * e.warp
 			charge := Vec3{1.0, 0.25, 0.1} * (e.charge * e.charge * 0.35)
-			draw_lit(res.fighter, entity_transform(e, e.radius * 0.62 * s), {1, 1, 1}, flash + Vec4{0, 0, 0, e.warp}, charge, 1)
+			draw_lit(
+				res.fighter,
+				entity_transform(e, e.radius * 0.62 * s),
+				{1, 1, 1},
+				flash + Vec4{0, 0, 0, e.warp},
+				charge,
+				1,
+			)
 		case .Boss:
 			draw_boss(e, flash)
 		case .Bolt, .Nova:
@@ -632,7 +680,14 @@ draw_world_opaque :: proc() {
 		if d.metal {
 			draw_lit(res.shard, transform_q(d.pos, d.rot, s), {1, 1, 1}, {}, heat, 1)
 		} else {
-			draw_lit(res.chunks[d.mesh % N_CHUNKS], transform_q(d.pos, d.rot, s), d.tint, {}, heat, 0.3)
+			draw_lit(
+				res.chunks[d.mesh % N_CHUNKS],
+				transform_q(d.pos, d.rot, s),
+				d.tint,
+				{},
+				heat,
+				0.3,
+			)
 		}
 	}
 
@@ -659,14 +714,28 @@ draw_boss :: proc(e: ^Entity, flash: Vec4) {
 	ry := y * c - x * s
 	scale := e.radius / 9.5 * (1 - e.warp * e.warp)
 	f := flash + Vec4{0, 0, 0, e.warp}
-	draw_lit(res.boss_hull, transform(e.pos, rx * scale, ry * scale, z * scale), {1, 1, 1}, f, {}, 1)
+	draw_lit(
+		res.boss_hull,
+		transform(e.pos, rx * scale, ry * scale, z * scale),
+		{1, 1, 1},
+		f,
+		{},
+		1,
+	)
 	pulse := 0.5 + 0.5 * math.sin(e.age * 5)
 	core_glow := Vec3{1.0, 0.15, 0.2} * (0.25 + pulse * 0.35 + e.charge * 0.6)
 	cs := scale * 3.4 * (1 + 0.06 * pulse)
 	spin2 := -e.age * 0.9
 	c2 := math.cos(spin2)
 	s2 := math.sin(spin2)
-	draw_lit(res.boss_core, transform(e.pos + z * 0.5 * scale, (x * c2 + z * s2) * cs, y * cs, (z * c2 - x * s2) * cs), {1, 1, 1}, f, core_glow, 1)
+	draw_lit(
+		res.boss_core,
+		transform(e.pos + z * 0.5 * scale, (x * c2 + z * s2) * cs, y * cs, (z * c2 - x * s2) * cs),
+		{1, 1, 1},
+		f,
+		core_glow,
+		1,
+	)
 }
 
 gun_transform :: proc(side: int) -> (rl.Matrix, Vec3, Vec3) {
@@ -704,7 +773,8 @@ draw_world_transparent :: proc() {
 	rlgl.DisableBackfaceCulling()
 
 	// shield bubble
-	if g.shield_hit > 0.01 || (g.phase == .Playing && g.shield > 0 && g.shield_delay > 0 && g.shield_delay < 0.4) {
+	if g.shield_hit > 0.01 ||
+	   (g.phase == .Playing && g.shield > 0 && g.shield_delay > 0 && g.shield_delay < 0.4) {
 		ss := res.shield
 		set_v3_name(ss, "uCamPos", g.rcam.position)
 		set_v3_name(ss, "uHitDir", g.shield_hit_dir)
@@ -713,7 +783,11 @@ draw_world_transparent :: proc() {
 		set_f_name(ss, "uTime", g.time)
 		set_v3_name(ss, "uShieldCol", Vec3{0.35, 0.8, 1.0} * 0.8)
 		rl.BeginBlendMode(.ADDITIVE)
-		rl.DrawMesh(res.sphere, res.shield_mat, transform(g.rcam.position, {3, 0, 0}, {0, 3, 0}, {0, 0, 3}))
+		rl.DrawMesh(
+			res.sphere,
+			res.shield_mat,
+			transform(g.rcam.position, {3, 0, 0}, {0, 3, 0}, {0, 0, 3}),
+		)
 		rl.EndBlendMode()
 	}
 
@@ -800,7 +874,12 @@ draw_entity_glows :: proc() {
 		switch e.kind {
 		case .Asteroid:
 			if e.molten {
-				bb_quad(e.pos, e.radius * 2.2, 0, rgba({1.0, 0.35, 0.08}, 0.18 + 0.05 * math.sin(e.age * 3)))
+				bb_quad(
+					e.pos,
+					e.radius * 2.2,
+					0,
+					rgba({1.0, 0.35, 0.08}, 0.18 + 0.05 * math.sin(e.age * 3)),
+				)
 			}
 		case .Drone:
 			s := e.radius * 0.8
@@ -822,18 +901,33 @@ draw_entity_glows :: proc() {
 			for sx in ([2]f32{-0.8, 0.8}) {
 				ep := e.pos + (x * sx - y * 0.07 - z * 1.6) * s
 				bb_quad(ep, 1.1 * s * flick, 0, rgba({1.0, 0.55, 0.2}, 0.95))
-				streak(ep, ep - z * (4.5 * s) - e.vel * 0.05, 0.45 * s, rgba({1.0, 0.4, 0.1}, 0.55))
+				streak(
+					ep,
+					ep - z * (4.5 * s) - e.vel * 0.05,
+					0.45 * s,
+					rgba({1.0, 0.4, 0.1}, 0.55),
+				)
 			}
 			for sx in ([2]f32{-2.6, 2.6}) {
 				blink := f32(0.15)
 				if math.sin(g.time * 6 + sx) > 0.6 {
 					blink = 1
 				}
-				bb_quad(e.pos + (x * sx - y * 0.1 - z * 1.2) * s, 0.5 * s, 0, rgba({1.0, 0.2, 0.2}, blink))
+				bb_quad(
+					e.pos + (x * sx - y * 0.1 - z * 1.2) * s,
+					0.5 * s,
+					0,
+					rgba({1.0, 0.2, 0.2}, blink),
+				)
 			}
 			if e.charge > 0 {
 				np := e.pos + z * (3.1 * s)
-				bb_quad(np, (0.6 + e.charge * 2.8) * s, g.time * 5, rgba({1.0, 0.3, 0.2}, 0.4 + e.charge * 0.6))
+				bb_quad(
+					np,
+					(0.6 + e.charge * 2.8) * s,
+					g.time * 5,
+					rgba({1.0, 0.3, 0.2}, 0.4 + e.charge * 0.6),
+				)
 				bb_quad(np, (0.3 + e.charge * 1.1) * s, 0, rgba({1.0, 0.9, 0.8}, e.charge))
 			}
 		case .Boss:
@@ -871,7 +965,12 @@ draw_entity_glows :: proc() {
 		case .Boss:
 			if e.charge > 0 {
 				_, _, z := look_basis(e.fwd, {0, 1, 0})
-				bb_quad(e.pos + z * 4, 10 + e.charge * 30, e.age, rgba({1.0, 0.25, 0.35}, e.charge))
+				bb_quad(
+					e.pos + z * 4,
+					10 + e.charge * 30,
+					e.age,
+					rgba({1.0, 0.25, 0.35}, e.charge),
+				)
 			}
 		}
 		if e.warp > 0 {
@@ -884,7 +983,12 @@ draw_entity_glows :: proc() {
 draw_boss_glows :: proc(e: ^Entity, x, y, z: Vec3) {
 	scale := e.radius / 9.5 * (1 - e.warp * e.warp)
 	pulse := 0.5 + 0.5 * math.sin(e.age * 5)
-	bb_quad(e.pos + z * (1.5 * scale), (6 + pulse * 2 + e.charge * 6) * scale, 0, rgba({1.0, 0.15, 0.25}, 0.55))
+	bb_quad(
+		e.pos + z * (1.5 * scale),
+		(6 + pulse * 2 + e.charge * 6) * scale,
+		0,
+		rgba({1.0, 0.15, 0.25}, 0.55),
+	)
 	for s in 0 ..< 4 {
 		ang := f32(s) / 4 * math.TAU + math.PI * 0.25
 		d := x * math.cos(ang) + y * math.sin(ang)
@@ -926,7 +1030,12 @@ draw_missile_fx :: proc() {
 				a := m.trail[k]
 				b := m.trail[k + 1]
 				t := f32(k) / f32(n - 1)
-				streak(a, b, 0.15 + 0.35 * t, rgba({1.0, 0.55 + 0.3 * t, 0.25 + 0.5 * t}, 0.08 + 0.4 * t * t))
+				streak(
+					a,
+					b,
+					0.15 + 0.35 * t,
+					rgba({1.0, 0.55 + 0.3 * t, 0.25 + 0.5 * t}, 0.08 + 0.4 * t * t),
+				)
 			}
 			streak(m.trail[n - 1], m.pos, 0.5, rgba({1.0, 0.85, 0.6}, 0.5))
 		}

@@ -11,7 +11,14 @@ HUD_ORANGE :: rl.Color{255, 172, 64, 255}
 HUD_RED :: rl.Color{255, 64, 88, 255}
 HUD_GREEN :: rl.Color{140, 255, 170, 255}
 
-SECTOR_NAMES := [?]cstring{"VIOLET RIFT", "CRIMSON VEIL", "EMERALD DRIFT", "DEEP AZURE", "SOLAR STORM", "PINK NOVA"}
+SECTOR_NAMES := [?]cstring {
+	"VIOLET RIFT",
+	"CRIMSON VEIL",
+	"EMERALD DRIFT",
+	"DEEP AZURE",
+	"SOLAR STORM",
+	"PINK NOVA",
+}
 
 // ---- helpers --------------------------------------------------------------------------------
 
@@ -76,7 +83,15 @@ kind_color :: proc(k: Entity_Kind) -> rl.Color {
 }
 
 // align: 0 = left, 0.5 = centre, 1 = right. pos.y is the top of the line.
-text :: proc(font: rl.Font, s: cstring, pos: Vec2, size: f32, col: rl.Color, align: f32 = 0, spacing: f32 = 0) {
+text :: proc(
+	font: rl.Font,
+	s: cstring,
+	pos: Vec2,
+	size: f32,
+	col: rl.Color,
+	align: f32 = 0,
+	spacing: f32 = 0,
+) {
 	if col.a == 0 {
 		return
 	}
@@ -88,7 +103,16 @@ text :: proc(font: rl.Font, s: cstring, pos: Vec2, size: f32, col: rl.Color, ali
 	rl.DrawTextEx(font, s, p, size, spacing, col)
 }
 
-glow_text :: proc(font: rl.Font, s: cstring, pos: Vec2, size: f32, col: rl.Color, align: f32 = 0, spacing: f32 = 0, glow: f32 = 1) {
+glow_text :: proc(
+	font: rl.Font,
+	s: cstring,
+	pos: Vec2,
+	size: f32,
+	col: rl.Color,
+	align: f32 = 0,
+	spacing: f32 = 0,
+	glow: f32 = 1,
+) {
 	if col.a == 0 {
 		return
 	}
@@ -319,7 +343,15 @@ draw_crosshair :: proc(u: f32) {
 	}
 	if g.overheated {
 		blink := 0.5 + 0.5 * math.sin(g.real_time * 18)
-		text(res.font_hud, "OVERHEAT", c + {0, 36 * u}, 13 * u, fade(HUD_RED, 0.5 + 0.5 * blink), 0.5, 3 * u)
+		text(
+			res.font_hud,
+			"OVERHEAT",
+			c + {0, 36 * u},
+			13 * u,
+			fade(HUD_RED, 0.5 + 0.5 * blink),
+			0.5,
+			3 * u,
+		)
 	}
 }
 
@@ -402,7 +434,12 @@ draw_offscreen :: proc(u: f32) {
 		}
 		n := Vec2{-d.y, d.x}
 		tip := p + d * size
-		rl.DrawTriangle(tip, p - d * (size * 0.5) + n * (size * 0.75), p - d * (size * 0.5) - n * (size * 0.75), col)
+		rl.DrawTriangle(
+			tip,
+			p - d * (size * 0.5) + n * (size * 0.75),
+			p - d * (size * 0.5) - n * (size * 0.75),
+			col,
+		)
 	}
 }
 
@@ -462,7 +499,15 @@ draw_lock :: proc(u: f32) {
 		rl.DrawRectangleV({sp.x - w * 0.5, y}, {w, 3 * u}, {0, 0, 0, 140})
 		rl.DrawRectangleV({sp.x - w * 0.5, y}, {w * clamp01(e.hp / e.max_hp), 3 * u}, col)
 	}
-	text(res.font_body, fmt.ctprintf("%dm", int(length(e.pos))), sp + {s + 7 * u, -s - 2 * u}, 15 * u, fade(col, 0.85), 0, 1 * u)
+	text(
+		res.font_body,
+		fmt.ctprintf("%dm", int(length(e.pos))),
+		sp + {s + 7 * u, -s - 2 * u},
+		15 * u,
+		fade(col, 0.85),
+		0,
+		1 * u,
+	)
 }
 
 draw_damage_marks :: proc(u: f32) {
@@ -499,7 +544,14 @@ draw_status :: proc(u: f32) {
 		scol = {120, 232, 255, 80}
 	}
 	text(res.font_hud, "SHIELD", {x, y_sh - 18 * u}, 12 * u, fade(HUD_CYAN, 0.75), 0, 3 * u)
-	text(res.font_body, fmt.ctprintf("%d", int(math.ceil(g.shield))), {x + w + 10 * u, y_sh - 4 * u}, 20 * u, scol, 1)
+	text(
+		res.font_body,
+		fmt.ctprintf("%d", int(math.ceil(g.shield))),
+		{x + w + 10 * u, y_sh - 4 * u},
+		20 * u,
+		scol,
+		1,
+	)
 	seg_bar(x, y_sh, w, h, g.shield / 100, scol, u)
 
 	hcol := lerp_color(HUD_RED, HUD_GREEN, smooth(0.2, 0.6, g.hull / 100))
@@ -507,24 +559,58 @@ draw_status :: proc(u: f32) {
 		hcol = HUD_WHITE
 	}
 	text(res.font_hud, "HULL", {x, y_hu - 18 * u}, 12 * u, fade(hcol, 0.75), 0, 3 * u)
-	text(res.font_body, fmt.ctprintf("%d", int(math.ceil(g.hull))), {x + w + 10 * u, y_hu - 4 * u}, 20 * u, hcol, 1)
+	text(
+		res.font_body,
+		fmt.ctprintf("%d", int(math.ceil(g.hull))),
+		{x + w + 10 * u, y_hu - 4 * u},
+		20 * u,
+		hcol,
+		1,
+	)
 	seg_bar(x, y_hu, w, h, g.hull / 100, hcol, u)
 
 	if g.hull < 30 {
 		blink := 0.5 + 0.5 * math.sin(g.real_time * 9)
-		glow_text(res.font_hud, "HULL CRITICAL", {x, y_sh - 46 * u}, 15 * u, fade(HUD_RED, 0.4 + 0.6 * blink), 0, 4 * u, blink)
+		glow_text(
+			res.font_hud,
+			"HULL CRITICAL",
+			{x, y_sh - 46 * u},
+			15 * u,
+			fade(HUD_RED, 0.4 + 0.6 * blink),
+			0,
+			4 * u,
+			blink,
+		)
 	} else if g.shield <= 0 {
-		text(res.font_hud, "SHIELD OFFLINE", {x, y_sh - 46 * u}, 13 * u, fade(HUD_ORANGE, 0.8), 0, 4 * u)
+		text(
+			res.font_hud,
+			"SHIELD OFFLINE",
+			{x, y_sh - 46 * u},
+			13 * u,
+			fade(HUD_ORANGE, 0.8),
+			0,
+			4 * u,
+		)
 	}
 }
 
 missile_icon :: proc(x, bottom, w, h: f32, col: rl.Color) {
 	body_top := bottom - h * 0.74
 	rl.DrawRectangleV({x + w * 0.18, body_top}, {w * 0.64, h * 0.62}, col)
-	rl.DrawTriangle({x + w * 0.18, body_top}, {x + w * 0.82, body_top}, {x + w * 0.5, bottom - h}, col)
+	rl.DrawTriangle(
+		{x + w * 0.18, body_top},
+		{x + w * 0.82, body_top},
+		{x + w * 0.5, bottom - h},
+		col,
+	)
 	fin_top := bottom - h * 0.3
 	rl.DrawTriangle({x + w * 0.18, fin_top}, {x, bottom}, {x + w * 0.18, bottom - h * 0.1}, col)
-	rl.DrawTriangle({x + w * 0.82, fin_top}, {x + w * 0.82, bottom - h * 0.1}, {x + w, bottom}, col)
+	rl.DrawTriangle(
+		{x + w * 0.82, fin_top},
+		{x + w * 0.82, bottom - h * 0.1},
+		{x + w, bottom},
+		col,
+	)
 }
 
 draw_missiles :: proc(u: f32) {
@@ -535,15 +621,36 @@ draw_missiles :: proc(u: f32) {
 	gap := 11 * u
 	right := sw - 34 * u
 	bottom := sh - 40 * u
-	text(res.font_hud, "MISSILES", {right, bottom - ih - 28 * u}, 12 * u, fade(HUD_ORANGE, 0.8), 1, 3 * u)
-	text(res.font_body, "RMB", {right - 118 * u, bottom - ih - 30 * u}, 15 * u, {255, 172, 64, 110}, 1, 2 * u)
+	text(
+		res.font_hud,
+		"MISSILES",
+		{right, bottom - ih - 28 * u},
+		12 * u,
+		fade(HUD_ORANGE, 0.8),
+		1,
+		3 * u,
+	)
+	text(
+		res.font_body,
+		"RMB",
+		{right - 118 * u, bottom - ih - 30 * u},
+		15 * u,
+		{255, 172, 64, 110},
+		1,
+		2 * u,
+	)
 	for k in 0 ..< MAX_AMMO {
 		x := right - f32(MAX_AMMO - k) * (iw + gap) + gap
 		missile_icon(x, bottom, iw, ih, {255, 172, 64, 36})
 		if k < g.ammo {
 			if k == g.ammo - 1 && g.ammo_flash > 0 {
 				rl.BeginBlendMode(.ADDITIVE)
-				sprite2(res.tex_soft, {x + iw * 0.5, bottom - ih * 0.5}, ih * (0.8 + g.ammo_flash), fade(HUD_ORANGE, g.ammo_flash))
+				sprite2(
+					res.tex_soft,
+					{x + iw * 0.5, bottom - ih * 0.5},
+					ih * (0.8 + g.ammo_flash),
+					fade(HUD_ORANGE, g.ammo_flash),
+				)
 				rl.EndBlendMode()
 			}
 			col := HUD_ORANGE
@@ -558,14 +665,28 @@ draw_missiles :: proc(u: f32) {
 			rl.EndScissorMode()
 		}
 	}
-	rl.DrawLineEx({right - f32(MAX_AMMO) * (iw + gap) + gap, bottom + 7 * u}, {right, bottom + 7 * u}, 1.5 * u, {255, 172, 64, 90})
+	rl.DrawLineEx(
+		{right - f32(MAX_AMMO) * (iw + gap) + gap, bottom + 7 * u},
+		{right, bottom + 7 * u},
+		1.5 * u,
+		{255, 172, 64, 90},
+	)
 }
 
 draw_score :: proc(u: f32) {
 	x := 34 * u
 	y := 26 * u
 	text(res.font_hud, "SCORE", {x, y}, 12 * u, fade(HUD_CYAN, 0.75), 0, 3 * u)
-	glow_text(res.font_hud, fmt.ctprintf("%07d", int(g.shown_score + 0.5)), {x, y + 16 * u}, 34 * u, HUD_WHITE, 0, 2 * u, 0.5)
+	glow_text(
+		res.font_hud,
+		fmt.ctprintf("%07d", int(g.shown_score + 0.5)),
+		{x, y + 16 * u},
+		34 * u,
+		HUD_WHITE,
+		0,
+		2 * u,
+		0.5,
+	)
 	if g.combo > 1 && g.combo_t > 0 {
 		mult := combo_mult()
 		cy := y + 62 * u
@@ -576,7 +697,15 @@ draw_score :: proc(u: f32) {
 			col = HUD_ORANGE
 		}
 		glow_text(res.font_hud, fmt.ctprintf("x%d", mult), {x, cy}, 26 * u, col, 0, 1 * u, 0.6)
-		text(res.font_body, fmt.ctprintf("CHAIN %d", g.combo), {x + 58 * u, cy + 5 * u}, 19 * u, fade(HUD_WHITE, 0.8), 0, 2 * u)
+		text(
+			res.font_body,
+			fmt.ctprintf("CHAIN %d", g.combo),
+			{x + 58 * u, cy + 5 * u},
+			19 * u,
+			fade(HUD_WHITE, 0.8),
+			0,
+			2 * u,
+		)
 		rl.DrawRectangleV({x, cy + 34 * u}, {150 * u, 3 * u}, {255, 255, 255, 30})
 		rl.DrawRectangleV({x, cy + 34 * u}, {150 * u * clamp01(g.combo_t / 2.6), 3 * u}, col)
 	}
@@ -587,9 +716,26 @@ draw_wave_info :: proc(u: f32) {
 	right := sw - 34 * u
 	y := 26 * u
 	text(res.font_hud, "WAVE", {right, y}, 12 * u, fade(HUD_CYAN, 0.75), 1, 3 * u)
-	glow_text(res.font_hud, fmt.ctprintf("%02d", g.level), {right, y + 16 * u}, 34 * u, HUD_WHITE, 1, 2 * u, 0.5)
+	glow_text(
+		res.font_hud,
+		fmt.ctprintf("%02d", g.level),
+		{right, y + 16 * u},
+		34 * u,
+		HUD_WHITE,
+		1,
+		2 * u,
+		0.5,
+	)
 	remaining := hostiles_alive() + (g.queue_n - g.queue_i)
-	text(res.font_body, fmt.ctprintf("HOSTILES  %d", remaining), {right, y + 60 * u}, 19 * u, fade(HUD_WHITE, 0.75), 1, 2 * u)
+	text(
+		res.font_body,
+		fmt.ctprintf("HOSTILES  %d", remaining),
+		{right, y + 60 * u},
+		19 * u,
+		fade(HUD_WHITE, 0.75),
+		1,
+		2 * u,
+	)
 	name := SECTOR_NAMES[max(g.level - 1, 0) % len(SECTOR_NAMES)]
 	text(res.font_body, name, {right, y + 82 * u}, 15 * u, fade(HUD_CYAN, 0.5), 1, 4 * u)
 }
@@ -622,7 +768,11 @@ draw_boss_bar :: proc(u: f32) {
 		tx := x + w * f32(k) / 4
 		rl.DrawLineEx({tx, y}, {tx, y + h}, 1.5 * u, {20, 0, 6, 200})
 	}
-	rl.DrawRectangleLinesEx({x - 3 * u, y - 3 * u, w + 6 * u, h + 6 * u}, 1.2 * u, fade(HUD_RED, 0.5 * appear))
+	rl.DrawRectangleLinesEx(
+		{x - 3 * u, y - 3 * u, w + 6 * u, h + 6 * u},
+		1.2 * u,
+		fade(HUD_RED, 0.5 * appear),
+	)
 }
 
 draw_radar :: proc(u: f32) {
@@ -695,18 +845,66 @@ draw_wave_banner :: proc(u: f32) {
 			rl.DrawRectangleV({0, cy - band * 0.5 - 3 * u}, {sw, 2 * u}, fade(HUD_RED, a * 0.8))
 			rl.DrawRectangleV({0, cy + band * 0.5 + 1 * u}, {sw, 2 * u}, fade(HUD_RED, a * 0.8))
 			size := fit_size(res.font_title, "WARNING", 64 * u, 0.12, sw * 0.8)
-			glow_text(res.font_title, "WARNING", {cx, cy - size * 0.5}, size, fade(HUD_RED, a * (0.55 + 0.45 * flash)), 0.5, size * 0.12, 1)
-			text(res.font_body, "MOTHERSHIP APPROACHING", {cx, cy + band * 0.5 + 16 * u}, 24 * u, fade(HUD_WHITE, a), 0.5, 8 * u)
+			glow_text(
+				res.font_title,
+				"WARNING",
+				{cx, cy - size * 0.5},
+				size,
+				fade(HUD_RED, a * (0.55 + 0.45 * flash)),
+				0.5,
+				size * 0.12,
+				1,
+			)
+			text(
+				res.font_body,
+				"MOTHERSHIP APPROACHING",
+				{cx, cy + band * 0.5 + 16 * u},
+				24 * u,
+				fade(HUD_WHITE, a),
+				0.5,
+				8 * u,
+			)
 		} else {
 			label := fmt.ctprintf("WAVE %d", g.level)
 			size := fit_size(res.font_title, label, 76 * u, 0.08, sw * 0.8)
 			spacing := size * (0.08 + 0.25 * (1 - ease_out(clamp01(t / 0.9))))
-			glow_text(res.font_title, label, {cx, cy - size * 0.5}, size, fade(HUD_WHITE, a), 0.5, spacing, 1)
+			glow_text(
+				res.font_title,
+				label,
+				{cx, cy - size * 0.5},
+				size,
+				fade(HUD_WHITE, a),
+				0.5,
+				spacing,
+				1,
+			)
 			ly := cy + size * 0.62
-			rl.DrawRectangleGradientH(i32(cx - lw), i32(ly), i32(lw), i32(max(2 * u, 1)), {120, 232, 255, 0}, fade(HUD_CYAN, a))
-			rl.DrawRectangleGradientH(i32(cx), i32(ly), i32(lw), i32(max(2 * u, 1)), fade(HUD_CYAN, a), {120, 232, 255, 0})
+			rl.DrawRectangleGradientH(
+				i32(cx - lw),
+				i32(ly),
+				i32(lw),
+				i32(max(2 * u, 1)),
+				{120, 232, 255, 0},
+				fade(HUD_CYAN, a),
+			)
+			rl.DrawRectangleGradientH(
+				i32(cx),
+				i32(ly),
+				i32(lw),
+				i32(max(2 * u, 1)),
+				fade(HUD_CYAN, a),
+				{120, 232, 255, 0},
+			)
 			name := SECTOR_NAMES[max(g.level - 1, 0) % len(SECTOR_NAMES)]
-			text(res.font_body, fmt.ctprintf("SECTOR  -  %s", name), {cx, ly + 12 * u}, 24 * u, fade(HUD_CYAN, a), 0.5, 7 * u)
+			text(
+				res.font_body,
+				fmt.ctprintf("SECTOR  -  %s", name),
+				{cx, ly + 12 * u},
+				24 * u,
+				fade(HUD_CYAN, a),
+				0.5,
+				7 * u,
+			)
 		}
 	case .Cleared:
 		t := g.wave_t
@@ -715,8 +913,25 @@ draw_wave_banner :: proc(u: f32) {
 			return
 		}
 		size := fit_size(res.font_title, "WAVE CLEARED", 58 * u, 0.1, sw * 0.8)
-		glow_text(res.font_title, "WAVE CLEARED", {cx, cy - size * 0.5}, size, fade(HUD_CYAN, a), 0.5, size * 0.1, 1)
-		text(res.font_body, fmt.ctprintf("BONUS +%d    HULL +15    SHIELDS RESTORED", 250 * g.level), {cx, cy + size * 0.7}, 22 * u, fade(HUD_WHITE, a * 0.9), 0.5, 5 * u)
+		glow_text(
+			res.font_title,
+			"WAVE CLEARED",
+			{cx, cy - size * 0.5},
+			size,
+			fade(HUD_CYAN, a),
+			0.5,
+			size * 0.1,
+			1,
+		)
+		text(
+			res.font_body,
+			fmt.ctprintf("BONUS +%d    HULL +15    SHIELDS RESTORED", 250 * g.level),
+			{cx, cy + size * 0.7},
+			22 * u,
+			fade(HUD_WHITE, a * 0.9),
+			0.5,
+			5 * u,
+		)
 	case .Active:
 	}
 }
@@ -803,7 +1018,14 @@ draw_title :: proc(u: f32) {
 	t := g.phase_t
 	a := smooth(0, 1.2, t)
 	rl.DrawRectangleGradientV(0, 0, i32(sw), i32(sh * 0.4), {0, 0, 0, 170}, {0, 0, 0, 0})
-	rl.DrawRectangleGradientV(0, i32(sh * 0.5), i32(sw), i32(sh * 0.5) + 1, {0, 0, 0, 0}, {0, 0, 0, 210})
+	rl.DrawRectangleGradientV(
+		0,
+		i32(sh * 0.5),
+		i32(sw),
+		i32(sh * 0.5) + 1,
+		{0, 0, 0, 0},
+		{0, 0, 0, 210},
+	)
 
 	title: cstring = "STARBREAKER"
 	size := fit_size(res.font_title, title, 112 * u, 0.1, sw * 0.88)
@@ -815,10 +1037,35 @@ draw_title :: proc(u: f32) {
 	}
 	off := (2.5 + 1.5 * math.sin(g.real_time * 2.3)) * u + abs(glitch)
 	rl.BeginBlendMode(.ADDITIVE)
-	text(res.font_title, title, {cx - off + glitch, ty}, size, {255, 40, 90, u8(110 * a)}, 0.5, spacing)
-	text(res.font_title, title, {cx + off + glitch, ty}, size, {40, 160, 255, u8(110 * a)}, 0.5, spacing)
+	text(
+		res.font_title,
+		title,
+		{cx - off + glitch, ty},
+		size,
+		{255, 40, 90, u8(110 * a)},
+		0.5,
+		spacing,
+	)
+	text(
+		res.font_title,
+		title,
+		{cx + off + glitch, ty},
+		size,
+		{40, 160, 255, u8(110 * a)},
+		0.5,
+		spacing,
+	)
 	rl.EndBlendMode()
-	glow_text(res.font_title, title, {cx + glitch * 0.3, ty}, size, fade(HUD_WHITE, a), 0.5, spacing, 1)
+	glow_text(
+		res.font_title,
+		title,
+		{cx + glitch * 0.3, ty},
+		size,
+		fade(HUD_WHITE, a),
+		0.5,
+		spacing,
+		1,
+	)
 
 	sub_y := ty + size * 1.05
 	sub: cstring = "DEEP SPACE ASTEROID DEFENSE"
@@ -827,8 +1074,22 @@ draw_title :: proc(u: f32) {
 	text(res.font_body, sub, {cx, sub_y}, sub_size, fade(HUD_CYAN, a * 0.9), 0.5, 9 * u)
 	lw := 90 * u
 	ly := sub_y + sub_size * 0.5
-	rl.DrawRectangleGradientH(i32(cx - m.x * 0.5 - lw - 16 * u), i32(ly), i32(lw), i32(max(u, 1)), {120, 232, 255, 0}, fade(HUD_CYAN, a))
-	rl.DrawRectangleGradientH(i32(cx + m.x * 0.5 + 16 * u), i32(ly), i32(lw), i32(max(u, 1)), fade(HUD_CYAN, a), {120, 232, 255, 0})
+	rl.DrawRectangleGradientH(
+		i32(cx - m.x * 0.5 - lw - 16 * u),
+		i32(ly),
+		i32(lw),
+		i32(max(u, 1)),
+		{120, 232, 255, 0},
+		fade(HUD_CYAN, a),
+	)
+	rl.DrawRectangleGradientH(
+		i32(cx + m.x * 0.5 + 16 * u),
+		i32(ly),
+		i32(lw),
+		i32(max(u, 1)),
+		fade(HUD_CYAN, a),
+		{120, 232, 255, 0},
+	)
 
 	rows := [?][2]cstring {
 		{"MOUSE TO SCREEN EDGE", "TURN"},
@@ -840,7 +1101,12 @@ draw_title :: proc(u: f32) {
 	}
 	row_h := 31 * u
 	ry := sh * 0.54
-	rl.DrawLineEx({cx, ry - 4 * u}, {cx, ry + f32(len(rows)) * row_h - 8 * u}, 1 * u, fade(HUD_CYAN, 0.35 * a))
+	rl.DrawLineEx(
+		{cx, ry - 4 * u},
+		{cx, ry + f32(len(rows)) * row_h - 8 * u},
+		1 * u,
+		fade(HUD_CYAN, 0.35 * a),
+	)
 	for row, i in rows {
 		y := ry + f32(i) * row_h
 		ra := a * smooth(0.3 + f32(i) * 0.08, 0.8 + f32(i) * 0.08, t)
@@ -850,12 +1116,37 @@ draw_title :: proc(u: f32) {
 
 	pulse := 0.55 + 0.45 * math.sin(g.real_time * 4)
 	py := sh * 0.87
-	glow_text(res.font_hud, "CLICK TO LAUNCH", {cx, py}, 22 * u, fade(HUD_ORANGE, a * pulse), 0.5, 8 * u, 1)
+	glow_text(
+		res.font_hud,
+		"CLICK TO LAUNCH",
+		{cx, py},
+		22 * u,
+		fade(HUD_ORANGE, a * pulse),
+		0.5,
+		8 * u,
+		1,
+	)
 	if g.best > 0 {
-		text(res.font_body, fmt.ctprintf("BEST  %07d", g.best), {cx, py + 36 * u}, 18 * u, fade(HUD_WHITE, a * 0.6), 0.5, 4 * u)
+		text(
+			res.font_body,
+			fmt.ctprintf("BEST  %07d", g.best),
+			{cx, py + 36 * u},
+			18 * u,
+			fade(HUD_WHITE, a * 0.6),
+			0.5,
+			4 * u,
+		)
 	}
 	if g.muted {
-		text(res.font_body, "MUTED", {sw - 30 * u, sh - 36 * u}, 16 * u, fade(HUD_WHITE, 0.5), 1, 3 * u)
+		text(
+			res.font_body,
+			"MUTED",
+			{sw - 30 * u, sh - 36 * u},
+			16 * u,
+			fade(HUD_WHITE, 0.5),
+			1,
+			3 * u,
+		)
 	}
 }
 
@@ -867,9 +1158,25 @@ draw_pause :: proc(u: f32) {
 	size := fit_size(res.font_title, "PAUSED", 68 * u, 0.18, sw * 0.8)
 	glow_text(res.font_title, "PAUSED", {cx, sh * 0.38}, size, HUD_WHITE, 0.5, size * 0.18, 1)
 	pulse := 0.55 + 0.45 * math.sin(g.real_time * 4)
-	text(res.font_body, "CLICK TO RESUME", {cx, sh * 0.38 + size * 1.3}, 22 * u, fade(HUD_CYAN, pulse), 0.5, 7 * u)
+	text(
+		res.font_body,
+		"CLICK TO RESUME",
+		{cx, sh * 0.38 + size * 1.3},
+		22 * u,
+		fade(HUD_CYAN, pulse),
+		0.5,
+		7 * u,
+	)
 	if g.muted {
-		text(res.font_body, "MUTED  -  PRESS M", {cx, sh * 0.38 + size * 1.3 + 34 * u}, 17 * u, fade(HUD_WHITE, 0.5), 0.5, 3 * u)
+		text(
+			res.font_body,
+			"MUTED  -  PRESS M",
+			{cx, sh * 0.38 + size * 1.3 + 34 * u},
+			17 * u,
+			fade(HUD_WHITE, 0.5),
+			0.5,
+			3 * u,
+		)
 	}
 }
 
@@ -879,47 +1186,126 @@ draw_game_over :: proc(u: f32) {
 	cx := sw * 0.5
 	t := g.phase_t
 	a := smooth(0, 0.8, t)
-	rl.DrawRectangleGradientV(0, 0, i32(sw), i32(sh) + 1, {40, 0, 10, u8(110 * a)}, {0, 0, 0, u8(200 * a)})
+	rl.DrawRectangleGradientV(
+		0,
+		0,
+		i32(sw),
+		i32(sh) + 1,
+		{40, 0, 10, u8(110 * a)},
+		{0, 0, 0, u8(200 * a)},
+	)
 
 	title: cstring = "SIGNAL LOST"
 	size := fit_size(res.font_title, title, 92 * u, 0.1, sw * 0.86)
 	ty := sh * 0.2
 	jit := (1 - smooth(0, 1.4, t)) * 16 * u * (randf() * 2 - 1)
 	rl.BeginBlendMode(.ADDITIVE)
-	text(res.font_title, title, {cx - 3 * u + jit, ty}, size, {255, 30, 60, u8(100 * a)}, 0.5, size * 0.1)
-	text(res.font_title, title, {cx + 3 * u - jit, ty}, size, {60, 120, 255, u8(70 * a)}, 0.5, size * 0.1)
+	text(
+		res.font_title,
+		title,
+		{cx - 3 * u + jit, ty},
+		size,
+		{255, 30, 60, u8(100 * a)},
+		0.5,
+		size * 0.1,
+	)
+	text(
+		res.font_title,
+		title,
+		{cx + 3 * u - jit, ty},
+		size,
+		{60, 120, 255, u8(70 * a)},
+		0.5,
+		size * 0.1,
+	)
 	rl.EndBlendMode()
-	glow_text(res.font_title, title, {cx + jit * 0.4, ty}, size, fade(HUD_RED, a), 0.5, size * 0.1, 1)
+	glow_text(
+		res.font_title,
+		title,
+		{cx + jit * 0.4, ty},
+		size,
+		fade(HUD_RED, a),
+		0.5,
+		size * 0.1,
+		1,
+	)
 
 	sy := ty + size * 1.35
 	sa := a * smooth(0.5, 1.0, t)
 	text(res.font_hud, "FINAL SCORE", {cx, sy}, 14 * u, fade(HUD_CYAN, sa * 0.8), 0.5, 5 * u)
-	glow_text(res.font_hud, fmt.ctprintf("%07d", g.score), {cx, sy + 22 * u}, 52 * u, fade(HUD_WHITE, sa), 0.5, 4 * u, 0.8)
+	glow_text(
+		res.font_hud,
+		fmt.ctprintf("%07d", g.score),
+		{cx, sy + 22 * u},
+		52 * u,
+		fade(HUD_WHITE, sa),
+		0.5,
+		4 * u,
+		0.8,
+	)
 
 	acc := 0
 	if g.shots > 0 {
 		acc = int(f32(g.hits) / f32(g.shots) * 100 + 0.5)
 	}
 	labels := [?]cstring{"WAVE REACHED", "HOSTILES DESTROYED", "ACCURACY"}
-	values := [?]cstring{fmt.ctprintf("%d", g.level), fmt.ctprintf("%d", g.kills), fmt.ctprintf("%d%%", acc)}
+	values := [?]cstring {
+		fmt.ctprintf("%d", g.level),
+		fmt.ctprintf("%d", g.kills),
+		fmt.ctprintf("%d%%", acc),
+	}
 	row_h := 32 * u
 	ry := sy + 100 * u
 	for i in 0 ..< len(labels) {
 		ra := a * smooth(0.9 + f32(i) * 0.2, 1.3 + f32(i) * 0.2, t)
 		y := ry + f32(i) * row_h
-		text(res.font_body, labels[i], {cx - 18 * u, y}, 23 * u, fade(HUD_CYAN, ra * 0.75), 1, 3 * u)
+		text(
+			res.font_body,
+			labels[i],
+			{cx - 18 * u, y},
+			23 * u,
+			fade(HUD_CYAN, ra * 0.75),
+			1,
+			3 * u,
+		)
 		text(res.font_body, values[i], {cx + 18 * u, y}, 23 * u, fade(HUD_WHITE, ra), 0, 3 * u)
 	}
 	by := ry + f32(len(labels)) * row_h + 18 * u
 	ba := a * smooth(1.5, 1.9, t)
 	if g.new_best {
 		blink := 0.6 + 0.4 * math.sin(g.real_time * 8)
-		glow_text(res.font_hud, "NEW RECORD", {cx, by}, 24 * u, fade(HUD_ORANGE, ba * blink), 0.5, 7 * u, 1)
+		glow_text(
+			res.font_hud,
+			"NEW RECORD",
+			{cx, by},
+			24 * u,
+			fade(HUD_ORANGE, ba * blink),
+			0.5,
+			7 * u,
+			1,
+		)
 	} else {
-		text(res.font_body, fmt.ctprintf("BEST  %07d", g.best), {cx, by}, 20 * u, fade(HUD_WHITE, ba * 0.65), 0.5, 4 * u)
+		text(
+			res.font_body,
+			fmt.ctprintf("BEST  %07d", g.best),
+			{cx, by},
+			20 * u,
+			fade(HUD_WHITE, ba * 0.65),
+			0.5,
+			4 * u,
+		)
 	}
 	if t > 1.8 {
 		pulse := 0.55 + 0.45 * math.sin(g.real_time * 4)
-		glow_text(res.font_hud, "CLICK TO REDEPLOY", {cx, sh * 0.86}, 22 * u, fade(HUD_ORANGE, smooth(1.8, 2.3, t) * pulse), 0.5, 8 * u, 1)
+		glow_text(
+			res.font_hud,
+			"CLICK TO REDEPLOY",
+			{cx, sh * 0.86},
+			22 * u,
+			fade(HUD_ORANGE, smooth(1.8, 2.3, t) * pulse),
+			0.5,
+			8 * u,
+			1,
+		)
 	}
 }

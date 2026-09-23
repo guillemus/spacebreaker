@@ -59,14 +59,27 @@ mb_box :: proc(b: ^Mesh_Builder, center, ax, ay, az: Vec3, c: RGBA8) {
 	for i in 0 ..< 8 {
 		corners[i] = center + ax * bit_sign(i, 1) + ay * bit_sign(i, 2) + az * bit_sign(i, 4)
 	}
-	faces := [6][4]int{{0, 1, 3, 2}, {4, 5, 7, 6}, {0, 1, 5, 4}, {2, 3, 7, 6}, {0, 2, 6, 4}, {1, 3, 7, 5}}
+	faces := [6][4]int {
+		{0, 1, 3, 2},
+		{4, 5, 7, 6},
+		{0, 1, 5, 4},
+		{2, 3, 7, 6},
+		{0, 2, 6, 4},
+		{1, 3, 7, 5},
+	}
 	for f in faces {
 		mb_quad_out(b, corners[f[0]], corners[f[1]], corners[f[2]], corners[f[3]], c, center)
 	}
 }
 
 // N-sided prism along +Z from z0 to z1.
-mb_prism :: proc(b: ^Mesh_Builder, sides: int, radius, z0, z1: f32, offset: Vec3, c_side, c_cap: RGBA8) {
+mb_prism :: proc(
+	b: ^Mesh_Builder,
+	sides: int,
+	radius, z0, z1: f32,
+	offset: Vec3,
+	c_side, c_cap: RGBA8,
+) {
 	center := offset + Vec3{0, 0, (z0 + z1) * 0.5}
 	for i in 0 ..< sides {
 		a0 := f32(i) / f32(sides) * math.TAU
@@ -128,15 +141,40 @@ ico_subdivide :: proc(out: ^[dynamic][3]Vec3, a, b, c: Vec3, level: int) {
 ico_sphere :: proc(level: int) -> [dynamic][3]Vec3 {
 	t := (1 + math.sqrt(f32(5))) / 2
 	v := [12]Vec3 {
-		{-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0},
-		{0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t},
-		{t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1},
+		{-1, t, 0},
+		{1, t, 0},
+		{-1, -t, 0},
+		{1, -t, 0},
+		{0, -1, t},
+		{0, 1, t},
+		{0, -1, -t},
+		{0, 1, -t},
+		{t, 0, -1},
+		{t, 0, 1},
+		{-t, 0, -1},
+		{-t, 0, 1},
 	}
 	f := [20][3]int {
-		{0, 11, 5}, {0, 5, 1}, {0, 1, 7}, {0, 7, 10}, {0, 10, 11},
-		{1, 5, 9}, {5, 11, 4}, {11, 10, 2}, {10, 7, 6}, {7, 1, 8},
-		{3, 9, 4}, {3, 4, 2}, {3, 2, 6}, {3, 6, 8}, {3, 8, 9},
-		{4, 9, 5}, {2, 4, 11}, {6, 2, 10}, {8, 6, 7}, {9, 8, 1},
+		{0, 11, 5},
+		{0, 5, 1},
+		{0, 1, 7},
+		{0, 7, 10},
+		{0, 10, 11},
+		{1, 5, 9},
+		{5, 11, 4},
+		{11, 10, 2},
+		{10, 7, 6},
+		{7, 1, 8},
+		{3, 9, 4},
+		{3, 4, 2},
+		{3, 2, 6},
+		{3, 6, 8},
+		{3, 8, 9},
+		{4, 9, 5},
+		{2, 4, 11},
+		{6, 2, 10},
+		{8, 6, 7},
+		{9, 8, 1},
 	}
 	tris: [dynamic][3]Vec3
 	for face in f {
@@ -158,7 +196,11 @@ noise3 :: proc(seed: i64, p: Vec3, freq: f32) -> f32 {
 }
 
 rock_height :: proc(seed: i64, d: Vec3, craters: []Crater, rough: f32) -> f32 {
-	h := 1 + 0.24 * noise3(seed, d, 1.1) + 0.10 * noise3(seed + 1, d, 2.7) * rough + 0.04 * noise3(seed + 2, d, 6.0) * rough
+	h :=
+		1 +
+		0.24 * noise3(seed, d, 1.1) +
+		0.10 * noise3(seed + 1, d, 2.7) * rough +
+		0.04 * noise3(seed + 2, d, 6.0) * rough
 	for c in craters {
 		a := math.acos(clamp(dot(d, c.dir), -1, 1)) / c.size
 		if a < 1 {
@@ -210,7 +252,12 @@ make_rock :: proc(seed: i64, level: int, molten: bool, rough: f32) -> rl.Mesh {
 			vein := noise3(seed + 11, centroid, 3.3)
 			if avg < 0.97 || abs(vein) < 0.12 {
 				heat := clamp01(1.15 - avg) + 0.3
-				col = {255, u8(clamp01(0.30 + heat * 0.35) * 255), u8(clamp01(0.05 + heat * 0.1) * 255), 20}
+				col = {
+					255,
+					u8(clamp01(0.30 + heat * 0.35) * 255),
+					u8(clamp01(0.05 + heat * 0.1) * 255),
+					20,
+				}
 			}
 		} else if noise3(seed + 19, centroid, 4.0) > 0.62 {
 			// rare mineral glints
@@ -311,7 +358,13 @@ make_fighter :: proc() -> rl.Mesh {
 	// fin
 	mb_tri(&b, T, Vec3{0, 1.35, -2.0}, Vec3{0, 0.5, -0.2}, accent)
 	// canopy
-	mb_tri(&b, C + Vec3{0, 0.04, 0}, C + Vec3{-0.28, -0.12, 0.8}, C + Vec3{0.28, -0.12, 0.8}, canopy)
+	mb_tri(
+		&b,
+		C + Vec3{0, 0.04, 0},
+		C + Vec3{-0.28, -0.12, 0.8},
+		C + Vec3{0.28, -0.12, 0.8},
+		canopy,
+	)
 	// cannons
 	mb_box(&b, {-1.25, -0.12, 0.5}, {0.09, 0, 0}, {0, 0.09, 0}, {0, 0, 0.9}, hull_dark)
 	mb_box(&b, {1.25, -0.12, 0.5}, {0.09, 0, 0}, {0, 0.09, 0}, {0, 0, 0.9}, hull_dark)
@@ -445,7 +498,13 @@ make_missile :: proc() -> rl.Mesh {
 	for i in 0 ..< 4 {
 		ang := f32(i) * math.PI * 0.5
 		d := Vec3{math.cos(ang), math.sin(ang), 0}
-		mb_tri(&b, d * 0.12 + Vec3{0, 0, -0.2}, d * 0.12 + Vec3{0, 0, -0.7}, d * 0.4 + Vec3{0, 0, -0.75}, dark)
+		mb_tri(
+			&b,
+			d * 0.12 + Vec3{0, 0, -0.2},
+			d * 0.12 + Vec3{0, 0, -0.7},
+			d * 0.4 + Vec3{0, 0, -0.75},
+			dark,
+		)
 	}
 	return mb_upload(&b)
 }

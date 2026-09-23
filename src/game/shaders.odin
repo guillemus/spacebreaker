@@ -38,7 +38,9 @@ float fbm(vec3 p) {
 
 // ---- lit meshes: asteroids, ships, guns, debris -------------------------------------------
 
-LIT_VS :: VS_PRE + `
+LIT_VS ::
+	VS_PRE +
+	`
 attribute vec3 vertexPosition;
 attribute vec3 vertexNormal;
 attribute vec4 vertexColor;
@@ -57,7 +59,9 @@ void main() {
 }
 `
 
-LIT_FS :: FS_PRE + `
+LIT_FS ::
+	FS_PRE +
+	`
 varying vec3 vPos;
 varying vec3 vNrm;
 varying vec4 vCol;
@@ -113,7 +117,9 @@ void main() {
 
 // ---- deflector bubble around the player ----------------------------------------------------
 
-SHIELD_FS :: FS_PRE + `
+SHIELD_FS ::
+	FS_PRE +
+	`
 varying vec3 vPos;
 varying vec3 vNrm;
 varying vec4 vCol;
@@ -151,7 +157,9 @@ void main() {
 
 // ---- gas giant ------------------------------------------------------------------------------
 
-PLANET_FS :: FS_PRE + `
+PLANET_FS ::
+	FS_PRE +
+	`
 varying vec3 vPos;
 varying vec3 vNrm;
 varying vec4 vCol;
@@ -162,7 +170,9 @@ uniform vec3 uColA;
 uniform vec3 uColB;
 uniform vec3 uAtmo;
 uniform float uTime;
-` + NOISE_GLSL + `
+` +
+	NOISE_GLSL +
+	`
 void main() {
 	vec3 N = normalize(vNrm);
 	vec3 V = normalize(uCamPos - vPos);
@@ -185,7 +195,9 @@ void main() {
 
 // ---- background nebula, rendered at half resolution ----------------------------------------
 
-NEBULA_FS :: FS_PRE + `
+NEBULA_FS ::
+	FS_PRE +
+	`
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 uniform vec3 uRight;
@@ -198,7 +210,9 @@ uniform vec3 uCol2;
 uniform vec3 uCol3;
 uniform vec3 uSunDir;
 uniform vec3 uSunCol;
-` + NOISE_GLSL + `
+` +
+	NOISE_GLSL +
+	`
 void main() {
 	vec2 ndc = vec2(fragTexCoord.x * 2.0 - 1.0, 1.0 - fragTexCoord.y * 2.0);
 	vec3 dir = normalize(uFwd + uRight * ndc.x * uTan.x + uUp * ndc.y * uTan.y);
@@ -221,7 +235,9 @@ void main() {
 
 // ---- bloom chain ----------------------------------------------------------------------------
 
-BRIGHT_FS :: FS_PRE + `
+BRIGHT_FS ::
+	FS_PRE +
+	`
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 uniform sampler2D texture0;
@@ -240,7 +256,9 @@ void main() {
 }
 `
 
-DOWN_FS :: FS_PRE + `
+DOWN_FS ::
+	FS_PRE +
+	`
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 uniform sampler2D texture0;
@@ -257,7 +275,9 @@ void main() {
 }
 `
 
-UP_FS :: FS_PRE + `
+UP_FS ::
+	FS_PRE +
+	`
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 uniform sampler2D texture0;
@@ -280,7 +300,9 @@ void main() {
 
 // ---- final composite: bloom, chromatic aberration, vignette, grain, flashes ----------------
 
-COMPOSITE_FS :: FS_PRE + `
+COMPOSITE_FS ::
+	FS_PRE +
+	`
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 uniform sampler2D texture0;

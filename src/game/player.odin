@@ -71,7 +71,9 @@ update_camera :: proc(real_dt: f32) {
 	yaw_s := shake * 0.05 * (math.sin(t * 37.3) * 0.6 + math.sin(t * 21.7 + 1.3) * 0.4)
 	pitch_s := shake * 0.04 * (math.sin(t * 41.1 + 0.7) * 0.6 + math.sin(t * 17.9 + 2.1) * 0.4)
 	roll_s := shake * 0.06 * math.sin(t * 29.3 + 0.3)
-	pos_s := Vec3{math.sin(t * 53.1), math.sin(t * 47.7 + 1.1), math.sin(t * 43.3 + 2.3)} * (shake * 0.25)
+	pos_s :=
+		Vec3{math.sin(t * 53.1), math.sin(t * 47.7 + 1.1), math.sin(t * 43.3 + 2.3)} *
+		(shake * 0.25)
 	rf := norm(fwd + right * yaw_s + up * pitch_s)
 	rr := norm(cross(rf, {0, 1, 0}))
 	ru := cross(rr, rf)
@@ -130,7 +132,17 @@ update_weapons :: proc(dt: f32) {
 		for side in 0 ..< 2 {
 			if randf() < 0.5 {
 				_, tip, z := gun_transform(side)
-				emit(.Smoke, tip - z * 0.5, g.up * rand_range(1, 2.5) + rand_unit() * 0.4, {0.8, 0.85, 0.9, 0.22}, {0.6, 0.6, 0.7, 0}, 0.1, 0.7, rand_range(0.5, 0.9), 1)
+				emit(
+					.Smoke,
+					tip - z * 0.5,
+					g.up * rand_range(1, 2.5) + rand_unit() * 0.4,
+					{0.8, 0.85, 0.9, 0.22},
+					{0.6, 0.6, 0.7, 0},
+					0.1,
+					0.7,
+					rand_range(0.5, 0.9),
+					1,
+				)
 			}
 		}
 		if g.heat <= 0.3 {
@@ -186,7 +198,18 @@ fire_bullet :: proc() {
 	g.shots += 1
 	add_light(tip + z * 5, Vec3{0.4, 0.85, 1.0} * 1.5, 12, 0.07)
 	for _ in 0 ..< 3 {
-		emit(.Spark, tip + z * 0.2, norm(z + rand_unit() * 0.35) * rand_range(8, 20), {0.7, 0.95, 1, 1}, {0.2, 0.5, 1, 0}, 0.018, 0.005, rand_range(0.06, 0.14), 3, 0.012)
+		emit(
+			.Spark,
+			tip + z * 0.2,
+			norm(z + rand_unit() * 0.35) * rand_range(8, 20),
+			{0.7, 0.95, 1, 1},
+			{0.2, 0.5, 1, 0},
+			0.018,
+			0.005,
+			rand_range(0.06, 0.14),
+			3,
+			0.012,
+		)
 	}
 	pan: f32 = -0.35
 	if side == 1 {
@@ -253,7 +276,17 @@ fire_missile :: proc() {
 	add_trauma(0.12)
 	sfx(.Missile, 1, sgn * 0.3)
 	for _ in 0 ..< 10 {
-		emit(.Smoke, pos + rand_unit() * 0.3, rand_unit() * 2.5 - g.fwd * 1.5, {0.7, 0.7, 0.75, 0.3}, {0.4, 0.4, 0.45, 0}, 0.2, 1.2, rand_range(0.5, 0.9), 2)
+		emit(
+			.Smoke,
+			pos + rand_unit() * 0.3,
+			rand_unit() * 2.5 - g.fwd * 1.5,
+			{0.7, 0.7, 0.75, 0.3},
+			{0.4, 0.4, 0.45, 0},
+			0.2,
+			1.2,
+			rand_range(0.5, 0.9),
+			2,
+		)
 	}
 	emit(.Glow, pos, {}, {1, 0.8, 0.5, 1}, {1, 0.4, 0.1, 0}, 0.5, 1.2, 0.1)
 }
@@ -324,8 +357,28 @@ update_missiles :: proc(dt: f32) {
 		for m.smoke_acc > 0.9 {
 			m.smoke_acc -= 0.9
 			p := m.pos - d * (1 + m.smoke_acc)
-			emit(.Smoke, p, rand_unit() * 0.6, {0.75, 0.72, 0.72, 0.32}, {0.35, 0.33, 0.36, 0}, 0.35, rand_range(1.6, 2.6), rand_range(0.9, 1.5), 1.2)
-			emit(.Glow, p, -d * 4 + rand_unit(), {1, 0.6, 0.2, 0.6}, {1, 0.2, 0.05, 0}, 0.6, 0.2, 0.18, 2)
+			emit(
+				.Smoke,
+				p,
+				rand_unit() * 0.6,
+				{0.75, 0.72, 0.72, 0.32},
+				{0.35, 0.33, 0.36, 0},
+				0.35,
+				rand_range(1.6, 2.6),
+				rand_range(0.9, 1.5),
+				1.2,
+			)
+			emit(
+				.Glow,
+				p,
+				-d * 4 + rand_unit(),
+				{1, 0.6, 0.2, 0.6},
+				{1, 0.2, 0.05, 0},
+				0.6,
+				0.2,
+				0.18,
+				2,
+			)
 		}
 
 		boom := m.age > 5 || length(m.pos) > 300

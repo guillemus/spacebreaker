@@ -6,7 +6,7 @@ import "core:mem"
 // Odin's default js allocator grows wasm memory on its own, which would fight
 // emscripten's sbrk. Route everything through emscripten's libc instead.
 @(default_calling_convention = "c")
-foreign {
+foreign _ {
 	@(link_name = "calloc")
 	c_calloc :: proc(num, size: c.size_t) -> rawptr ---
 	@(link_name = "malloc")
